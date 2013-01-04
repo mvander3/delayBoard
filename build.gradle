@@ -1,0 +1,95 @@
+apply plugin:'java'
+
+version = '0.5'
+
+def distFolder = 'build/dist'
+
+jar.manifest.writeTo("$buildDir/MANIFEST.MF")
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    // Don't include resources in the main source-set. Don't want them being packaged in the jar
+    main {
+        resources {
+            exclude '*'
+        }
+    }
+}
+
+dependencies {
+    compile project(':util')
+    compile project(':speakEasy')
+    compile 'org.eclipse.jetty:jetty-server:8.1.7.v20120910'
+    compile 'org.eclipse.jetty:jetty-servlet:8.1.7.v20120910'
+    compile 'org.springframework:spring-beans:3.2.0.RELEASE'
+    compile 'org.springframework:spring-core:3.2.0.RELEASE'
+    compile 'org.springframework:spring-context:3.2.0.RELEASE'
+    compile 'com.google.guava:guava:12.0.1'
+    compile 'log4j:log4j:1.2.17'
+}
+
+
+defaultTasks 'dist'
+
+// Alias dist to distTGZ
+task dist(dependsOn: 'distTGZ') {}
+
+task distTar(type: Tar, dependsOn: 'copyFiles') {
+    from "$distFolder"
+    destinationDir file("$buildDir")
+}
+
+task distZip(type: Zip, dependsOn: 'copyFiles') {
+    from "$distFolder"
+    destinationDir file("$buildDir")
+}
+
+task distTGZ(type: Tar, dependsOn: 'copyFiles') {
+    compression = Compression.GZIP 
+    from "$distFolder"
+    destinationDir file("$buildDir")
+}
+
+task copyFiles(dependsOn: 'copyAppJar') << {
+    copy {
+        from 'scripts'
+        into "$distFolder/scripts"
+    }
+    copy {
+        from 'src/main/web'
+        into "$distFolder/web"
+    }
+    copy {
+        from 'src/main/resources'
+        into "$distFolder"
+    }
+}
+
+task copyAppJar(dependsOn: 'copyDependentJars') << {
+    copy {
+        from "$buildDir/libs/delayBoard-${version}.jar"
+        into "$distFolder/lib"
+    }
+}
+
+task copyDependentJars(type: Copy, dependsOn: 'jar') {
+    from configurations.runtime
+    into "$distFolder/lib"
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'org.mvander3.util.spring.SpringMain',
+            'Implementation-Title': 'Delay Board',
+            'Implementation-Version': version,
+            'Built-By': 'Mike Vander Pluym',
+            'Built-Date': new Date(),
+            'Built-JDK': System.getProperty('java.version'),
+            'Built-Gradle': gradle.gradleVersion
+        ) 
+    }
+}

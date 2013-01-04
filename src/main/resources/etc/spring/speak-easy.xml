@@ -1,0 +1,30 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    
+    <bean id="dispatchingRequestHandler" class="org.mvander3.speakEasy.action.DispatchingRequestHandlerDecorator" scope="singleton">
+        <property name="requestHandlerRegistry" ref="requestHandlerRegistry" />
+        <property name="actionNameResolver" ref="actionNameResolver" />
+    </bean>
+    
+    <bean id="requestHandlerRegistry" class="org.mvander3.speakEasy.action.RequestHandlerRegistry">
+        <property name="registry">
+            <map>
+                <entry key="employee.lookup"       value-ref="employeeLookupRequestHandler" />
+                <entry key="employee.add"          value-ref="employeeAddRequestHandler" />
+                <entry key="employee.delete"       value-ref="employeeDeleteRequestHandler" />
+                <entry key="delay.lookup"          value-ref="delayTimeLookupRequestHandler" />
+                <entry key="delay.update"          value-ref="delayTimeUpdateRequestHandler" />
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="actionNameResolver" class="org.mvander3.speakEasy.action.MessageHeaderActionNameResolver" />
+    
+    <bean id="messageFactory" class="org.mvander3.speakEasy.message.http.HttpServletRequestMessageFactory">
+        <property name="addHeadersAsProperties" value="true" />
+        <property name="addParametersAsProperties" value="false" />
+    </bean>
+    
+</beans>

@@ -1,0 +1,14 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    
+    <bean id="employeeRepository" class="org.mvander3.delayBoard.employee.repository.CachingEmployeeRepositoryDecorator">
+        <property name="delegate" ref="fileEmployeeRepository" />
+    </bean>
+    
+    <bean id="fileEmployeeRepository" class="org.mvander3.delayBoard.employee.repository.FileEmployeeRepository" scope="singleton">
+        <property name="employeeFileName" value="./employees.txt" />
+    </bean>
+    
+</beans>

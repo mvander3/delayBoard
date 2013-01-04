@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+    
+    <bean id="jsonStringMessageTranscoder" class="org.mvander3.speakEasy.message.JsonStringMessageTranscoder" >
+        <property name="jsonMapper" ref="jsonMapper" />
+    </bean>
+    
+    <bean id="abstractTypedRequestHandler" abstract="true" class="org.mvander3.speakEasy.request.AbstractTypedRequestHandler" init-method="init">
+        <property name="messageTranscoder" ref="jsonStringMessageTranscoder" />
+    </bean>
+    
+    <bean id="employeeLookupRequestHandler" parent="abstractTypedRequestHandler" class="org.mvander3.delayBoard.employee.action.lookup.EmployeeLookupRequestHandler">
+        <property name="repository" ref="employeeRepository" />
+    </bean>
+    
+    <bean id="employeeAddRequestHandler" parent="abstractTypedRequestHandler" class="org.mvander3.delayBoard.employee.action.add.EmployeeAddRequestHandler">
+        <property name="repository" ref="employeeRepository" />
+    </bean>
+    
+    <bean id="employeeDeleteRequestHandler" parent="abstractTypedRequestHandler" class="org.mvander3.delayBoard.employee.action.delete.EmployeeDeleteRequestHandler">
+        <property name="repository" ref="employeeRepository" />
+    </bean>
+    
+    <bean id="delayTimeLookupRequestHandler" parent="abstractTypedRequestHandler" class="org.mvander3.delayBoard.delayTime.action.lookup.DelayTimeLookupRequestHandler">
+        <property name="repository" ref="delayTimeRepository" />
+    </bean>
+    
+    <bean id="delayTimeUpdateRequestHandler" parent="abstractTypedRequestHandler" class="org.mvander3.delayBoard.delayTime.action.update.DelayTimeUpdateRequestHandler">
+        <property name="repository" ref="delayTimeRepository" />
+    </bean>
+    
+    
+</beans>

@@ -1,0 +1,99 @@
+<!-- =============================================================== -->
+<!-- Configure the Jetty Server with Spring                          -->
+<!-- This file is the equivalent of jetty.xml, but written in spring -->
+<!-- XmlBeanFactory format.                                          -->
+<!-- The modules/spring/src/org/mortbay/spring/Main.java may be used -->
+<!-- to run this file - or any other spring infrastructure that      -->
+<!-- accepts uses an XmlBeanFactory                                  -->
+<!-- =============================================================== -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+  <bean id="Server" class="org.eclipse.jetty.server.Server" init-method="start" destroy-method="stop">
+  
+    <property name="threadPool">  
+      <bean id="ThreadPool" class="org.eclipse.jetty.util.thread.QueuedThreadPool">
+        <property name="minThreads" value="10"/>
+        <property name="maxThreads" value="50"/>
+      </bean>
+    </property>
+    
+    <property name="connectors">
+      <list>
+        <bean id="Connector" class="org.eclipse.jetty.server.nio.SelectChannelConnector">
+          <property name="port" value="8080"/>
+          <property name="maxIdleTime" value="30000"/>
+          <property name="acceptors" value="2"/>
+          <property name="confidentialPort" value="8443"/>
+        </bean>
+      </list>
+    </property>
+    
+    <property name="handler">
+      <bean id="handlers" class="org.eclipse.jetty.server.handler.HandlerCollection">
+        <property name="handlers">
+          <list>
+             <bean class="org.eclipse.jetty.server.handler.ResourceHandler">
+               <property name="directoriesListed" value="true"/>
+               <property name="welcomeFiles">
+                 <list>
+                   <value>index.html</value>
+                 </list>
+               </property>
+               <property name="resourceBase" value="${web.root}"/>
+             </bean>       
+             <bean id="contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
+               <property name="handlers">
+                 <list>
+                   <bean class="org.eclipse.jetty.servlet.ServletContextHandler">
+                     <property name="contextPath" value="/"/>
+                     <property name="servletHandler">
+                       <bean class="org.eclipse.jetty.servlet.ServletHandler">
+                         <property name="servlets">
+                           <list>
+                             <bean class="org.eclipse.jetty.servlet.ServletHolder" p:name="ActionDispatcher">
+                               <property name="servlet">
+                                 <bean class="org.mvander3.speakEasy.web.ActionDispatcherServlet" />
+                               </property>
+                               <property name="initParameters">
+                                 <map>
+                                 <!--
+                                   <entry key="requestHandler" value-ref="dispatchingRequestHandler" />
+                                   <entry key="messageFactory" value-ref="messageFactory" />
+                                 -->
+                                 </map>
+                               </property>
+                             </bean>
+                           </list>
+                         </property>
+                         <property name="servletMappings">
+                           <list>
+                             <bean class="org.eclipse.jetty.servlet.ServletMapping">
+                               <property name="servletName" value="ActionDispatcher"/>
+                               <property name="pathSpecs">
+                                 <list>
+                                   <value>/speakEasy</value>
+                                 </list>
+                               </property>
+                             </bean>
+                           </list>
+                         </property>
+                       </bean>
+                     </property>
+                   </bean>
+                 </list>
+               </property>
+             </bean>
+             <bean id="defaultHandler" class="org.eclipse.jetty.server.handler.DefaultHandler"/>
+             <bean id="requestLog" class="org.eclipse.jetty.server.handler.RequestLogHandler"/>
+          </list>
+        </property>
+      </bean>
+    </property>
+  </bean>
+
+</beans>

@@ -1,0 +1,1 @@
+java -cp lib/* -Dconfig.files="etc/spring/*.xml" -Dweb.root="web" org.mvander3.util.spring.SpringMain
